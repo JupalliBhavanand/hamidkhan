@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="onyx">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101411">
+<title>National Protective Service · Executive Card</title>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg: #0b0f0c;
+  --surface: #141a15;
+  --surface-border: #232c24;
+  --ink: #f4f5f0;
+  --muted: #8e988f;
+  --accent: #d0be90;
+  --accent-glow: rgba(208, 190, 144, 0.25);
+  --line: rgba(255, 255, 255, 0.12);
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  color-scheme: dark;
+}
+
+[data-theme=sapphire] {
+  --bg: #070d19;
+  --surface: #0f1a2e;
+  --surface-border: #1a2b47;
+  --ink: #f0f4fd;
+  --muted: #8b9bb4;
+  --accent: #8cb6f5;
+  --accent-glow: rgba(140, 182, 245, 0.25);
+}
+
+[data-theme=emerald] {
+  --bg: #051410;
+  --surface: #0c241d;
+  --surface-border: #15382e;
+  --ink: #edfae8;
+  --muted: #88a89c;
+  --accent: #78d6a3;
+  --accent-glow: rgba(120, 214, 163, 0.25);
+}
+
+[data-theme=ivory] {
+  --bg: #f4efea;
+  --surface: #e8e1d7;
+  --surface-border: #d4c9ba;
+  --ink: #1c201d;
+  --muted: #5e6660;
+  --accent: #826639;
+  --accent-glow: rgba(130, 102, 57, 0.25);
+  --line: rgba(0, 0, 0, 0.12);
+  color-scheme: light;
+}
+
+[data-theme=plum] {
+  --bg: #160c18;
+  --surface: #251628;
+  --surface-border: #3d2442;
+  --ink: #faeff8;
+  --muted: #ab90aa;
+  --accent: #de9bc0;
+  --accent-glow: rgba(222, 155, 192, 0.25);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+button, input { font: inherit; }
+button { cursor: pointer; color: inherit; background: transparent; border: 1px solid var(--line); }
+a { color: inherit; text-decoration: none; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+
+svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* Structural Layout */
+.viewport {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 2000px;
+  padding: 20px;
+}
+
+.flipper {
+  width: 100%;
+  max-width: 1050px;
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.flipper.flipped {
+  transform: rotateY(180deg);
+}
+
+.face {
+  grid-area: 1/1;
+  min-height: 580px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: radial-gradient(circle at 85% 20%, var(--accent-glow), transparent 45%), var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  padding: 40px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  transition: background 0.5s, border-color 0.5s, color 0.5s;
+}
+
+.face::before {
+  content: '';
+  position: absolute;
+  inset: 12px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+/* Header Branding */
+.brand-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 22px;
+  z-index: 2;
+}
+
+.brand {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Adjusted Logo Style for npslog.png */
+.logo-container {
+  width: 58px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  padding: 6px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.brand-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px var(--accent-glow));
+}
+
+.brand-title {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.edition {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.edition::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+}
+
+/* Main Hero Grid */
+.hero {
+  display: grid;
+  grid-template-columns: 1.3fr 0.9fr;
+  align-items: center;
+  gap: 50px;
+  padding: 30px 0;
+  z-index: 2;
+}
+
+.overline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.overline::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--accent);
+}
+
+h1 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: clamp(32px, 4.2vw, 56px);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 16px 0 12px;
+}
+
+h1 span {
+  display: block;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.role {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.contacts {
+  margin-top: 28px;
+  display: grid;
+  gap: 12px;
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink);
+  opacity: 0.85;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.contact:hover {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateX(4px);
+}
+
+.contact svg {
+  color: var(--accent);
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  transition: all 0.25s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--bg);
+  border-color: var(--accent);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.primary:hover {
+  background: var(--accent);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+/* Portrait Styling */
+.portrait-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  justify-self: end;
+}
+
+.portrait-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -8px 8px 8px -8px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.portrait {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 320px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  border: 1px solid var(--line);
+}
+
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  filter: contrast(1.05) saturate(0.85);
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.portrait:hover img {
+  transform: scale(1.04);
+  filter: contrast(1) saturate(1);
+}
+
+.portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 40%);
+}
+
+.photo-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  color: #fff;
+  z-index: 2;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.portrait-label {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.portrait-label b {
+  color: var(--accent);
+}
+
+/* Footer Section */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  z-index: 2;
+}
+
+.footer div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Back Face Content */
+.back-content {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  align-items: center;
+  gap: 40px;
+  padding: 20px 0;
+  z-index: 2;
+}
+
+.back h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 3.5vw, 42px);
+  line-height: 1.15;
+  margin: 14px 0;
+}
+
+.back p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.8;
+  max-width: 440px;
+}
+
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0 28px;
+}
+
+.tags span {
+  font-size: 10px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.qr-block {
+  text-align: center;
+}
+
+.qr-paper {
+  padding: 16px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  display: inline-block;
+}
+
+#qrcode {
+  width: 200px;
+  height: 200px;
+  display: grid;
+  place-items: center;
+}
+
+#qrcode img, #qrcode canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Fixed Bottom Control Bar */
+.toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  backdrop-filter: blur(12px);
+}
+
+.toolbar button {
+  border: 0;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.toolbar .divider {
+  height: 20px;
+  width: 1px;
+  background: var(--line);
+  margin: 0 4px;
+}
+
+.theme-pop {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  width: 260px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.theme-pop[hidden] { display: none; }
+.swatches { display: flex; gap: 10px; margin-top: 12px; }
+.swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--swatch);
+  border: 2px solid var(--surface);
+  outline: 1px solid var(--line);
+  padding: 0;
+}
+.swatch[aria-pressed=true] {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Modal Drawer */
+dialog {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(420px, 100%);
+  height: 100dvh;
+  background: var(--surface);
+  color: var(--ink);
+  border: 0;
+  border-left: 1px solid var(--surface-border);
+  box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+}
+
+dialog[open] { animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+dialog::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+
+.drawer-head {
+  padding: 24px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-head h2 { font-family: var(--font-heading); font-size: 20px; margin: 4px 0 0; }
+.close { border-radius: 50%; width: 32px; height: 32px; font-size: 18px; border: 1px solid var(--line); }
+
+.form { padding: 24px; display: grid; gap: 16px; }
+.form label { display: grid; gap: 6px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  font-size: 13px;
+}
+input:focus { outline: 1px solid var(--accent); }
+
+.notice {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 20px;
+  border: 1px solid var(--accent);
+  border-radius: 30px;
+  font-size: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.notice:empty { display: none; }
+
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+/* Responsive adjustments */
+@media (max-width: 850px) {
+  .hero { grid-template-columns: 1fr; gap: 30px; }
+  .portrait-wrap { justify-self: start; max-width: 100%; }
+  .portrait { height: 260px; }
+  .back-content { grid-template-columns: 1fr; }
+  .qr-block { justify-self: start; }
+  .face { padding: 30px 24px; }
+}
+@media print {
+  .toolbar, dialog, .notice, .hero-actions, .photo-hint { display: none !important; }
+  .viewport { perspective: none; }
+  .flipper { transform: none !important; }
+  .face { border: 1px solid #ccc; background: #fff !important; color: #000 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Hidden SVG Icon System -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="phone" viewBox="0 0 24 24"><path d="m5 3 4 5-2 3a17 17 0 0 0 6 6l3-2 5 4c-2 6-9 2-14-3S-2 5 5 3Z"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 6 9 7 9-7"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></symbol>
+  <symbol id="flip" viewBox="0 0 24 24"><path d="M20 9a8 8 0 0 0-14-4L3 8m0-5v5h5M4 15a8 8 0 0 0 14 4l3-3m0 5v-5h-5"/></symbol>
+  <symbol id="palette" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="9" r="1"/><circle cx="14" cy="7" r="1"/><circle cx="17" cy="12" r="1"/><path d="M7 19c-2-6 9-1 5-7"/></symbol>
+  <symbol id="edit" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7l-4-4L5 15Z"/></symbol>
+  <symbol id="print" viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 17H3V9h18v8h-3M6 14h12v7H6Z"/></symbol>
+</svg>
+
+<main class="viewport">
+  <div class="flipper" id="flipper">
+    
+    <!-- Front Face -->
+    <section class="face front" id="front" aria-label="Front of business card">
+      <header class="brand-row">
+        <div class="brand">
+          <div class="logo-container">
+            <img class="brand-logo-img" id="photo1" alt="National Protective Service Logo" src="npslog.png">
+          </div>
+          <div>
+            <div class="brand-title">National<br>Protective Service</div>
+            <div class="eyebrow">Integrity · Vigilance · Protection</div>
+          </div>
+        </div>
+        <div class="edition">Executive Collection / 01</div>
+      </header>
+
+      <div class="hero">
+        <div class="intro">
+          <div class="overline">Executive Protection & Security</div>
+          <h1 id="displayName">Imran <span>Shaik</span></h1>
+          <div class="role" id="displayTitle">Manager · Security Operations</div>
+          
+          <div class="contacts">
+            <a class="contact" id="phoneLink"><svg><use href="#phone"/></svg><span id="displayPhone"></span></a>
+            <a class="contact" id="emailLink"><svg><use href="#mail"/></svg><span id="displayEmail"></span></a>
+            <a class="contact" id="websiteLink" target="_blank" rel="noopener noreferrer"><svg><use href="#globe"/></svg><span id="displayWebsite"></span></a>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Save Contact</button>
+            <button class="btn" onclick="flipCard()">View Reverse<svg><use href="#arrow"/></svg></button>
+          </div>
+        </div>
+
+        <div class="portrait-wrap">
+          <button class="portrait" onclick="choosePhoto()" aria-label="Change profile photo">
+            <img id="photo" alt="Executive portrait" src="image.jpg">
+            <span class="photo-hint">Change Portrait ↗</span>
+          </button>
+          <div class="portrait-label">
+            <b>Executive Profile</b>
+            <span id="displayBadgeId">NPS-8842-EXEC</span>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <div><svg><use href="#globe"/></svg><span id="displayAddress">Corporate Headquarters · San Jose, CA</span></div>
+        <span>Licensed & Bonded Security Agency</span>
+      </footer>
+    </section>
+
+    <!-- Back Face -->
+    <section class="face back" id="back" aria-label="Back of business card" inert>
+      <header class="brand-row">
+        <div class="brand">
+          <div class="logo-container">
+            <img class="brand-logo-img" alt="National Protective Service Logo" src="npslog.png">
+          </div>
+          <div class="brand-title">National<br>Protective Service</div>
+        </div>
+        <div class="edition">Executive Collection / 02</div>
+      </header>
+
+      <div class="back-content">
+        <div>
+          <div class="overline">Instant Connection</div>
+          <h2>Protection begins<br>with a connection.</h2>
+          <p>Scan this QR code with your mobile device camera to save contact credentials directly to your address book.</p>
+          <div class="tags">
+            <span>24/7 Security Patrol</span>
+            <span>Executive Protection</span>
+            <span>Risk Assessment</span>
+          </div>
+          <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Download vCard</button>
+        </div>
+
+        <div class="qr-block">
+          <div class="qr-paper">
+            <div id="qrcode" aria-label="Contact vCard QR code">Generating QR Code...</div>
+          </div>
+          <div class="eyebrow" style="margin-top: 10px; color: var(--accent)">Scan to save details</div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <span>National Protective Service Corporation</span>
+        <span>Your Security. Our Commitment.</span>
+      </footer>
+    </section>
+
+  </div>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="toolbar" aria-label="Card controls">
+  <div>
+    <button id="themeButton" aria-expanded="false" aria-controls="themePop" onclick="toggleThemes()"><svg><use href="#palette"/></svg>Themes</button>
+    <div class="theme-pop" id="themePop" hidden>
+      <div class="eyebrow">Select Finish</div>
+      <div class="swatches" id="swatches"></div>
+      <div class="theme-name" id="themeName" style="margin-top: 10px; font-size: 11px; color: var(--accent);"></div>
+    </div>
+  </div>
+  <span class="divider"></span>
+  <button id="flipButton" onclick="flipCard()"><svg><use href="#flip"/></svg><span id="flipLabel">Reverse</span></button>
+  <button onclick="openEditor()"><svg><use href="#edit"/></svg>Customize</button>
+  <button onclick="window.print()"><svg><use href="#print"/></svg>Print</button>
+</nav>
+
+<!-- Drawer Editor -->
+<dialog id="editor" aria-labelledby="editorTitle">
+  <div class="drawer-head">
+    <div>
+      <div class="eyebrow">Card Editor</div>
+      <h2 id="editorTitle">Personalize Card</h2>
+    </div>
+    <button class="close" onclick="editor.close()" aria-label="Close editor">×</button>
+  </div>
+  <form class="form" id="form" method="dialog">
+    <button type="button" class="btn" onclick="choosePhoto()">Upload Portrait Photo</button>
+    <div id="fields" style="display:contents"></div>
+    <button class="btn primary" type="submit">Save Changes</button>
+  </form>
+</dialog>
+
+<input type="file" id="file" accept="image/*" hidden>
+<div class="notice" id="notice" role="status" aria-live="polite"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const data = {
+  Name: 'Hamid Khan',
+  Title: 'Partner & Director of Operations',
+  Phone: '+1 (510) 309-7999',
+  Email: 'hamid@nationalprotectiveservice.com',
+  Website: 'https://nationalprotectiveservice.com',
+  BadgeId: 'NPS-8842-EXEC',
+  Address: 'Corporate Headquarters · San Jose, CA'
+};
+    
+const themes = {
+  onyx: ['Onyx & Champagne', '#d5c49a'],
+  sapphire: ['Midnight Sapphire', '#8cb6f5'],
+  emerald: ['Heritage Emerald', '#78d6a3'],
+  ivory: ['Warm Ivory', '#826639'],
+  plum: ['Velvet Plum', '#de9bc0']
+};
+
+let reversed = false, qrTimer, noticeTimer, photoURL;
+const editor = $('editor');
+
+// Build Form Inputs
+Object.entries(data).forEach(([key, value]) => {
+  const label = document.createElement('label');
+  label.textContent = ({
+    Name: 'Full Name', Title: 'Job Title', Phone: 'Phone Number',
+    Email: 'Email Address', Website: 'Website URL', BadgeId: 'Credential ID', Address: 'Office Address'
+  })[key];
+  
+  const input = document.createElement('input');
+  input.value = value;
+  input.name = key;
+  input.maxLength = key === 'Website' ? 250 : 120;
+  input.type = key === 'Email' ? 'email' : key === 'Website' ? 'url' : key === 'Phone' ? 'tel' : 'text';
+  
+  input.addEventListener('input', () => {
+    data[key] = input.value;
+    render();
+    clearTimeout(qrTimer);
+    qrTimer = setTimeout(generateQR, 300);
+  });
+  
+  label.append(input);
+  $('fields').append(label);
+});
+
+// Theme Swatches Setup
+Object.entries(themes).forEach(([key, [label, color]]) => {
+  const button = document.createElement('button');
+  button.className = 'swatch';
+  button.style.setProperty('--swatch', color);
+  button.title = label;
+  button.setAttribute('aria-label', label);
+  button.dataset.theme = key;
+  button.onclick = () => setTheme(key);
+  $('swatches').append(button);
+});
+
+function setTheme(key) {
+  if (!themes[key]) key = 'onyx';
+  document.documentElement.dataset.theme = key;
+  $('themeName').textContent = themes[key][0];
+  document.querySelectorAll('.swatch').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === key)));
+  try { localStorage.setItem('nps-card-theme', key); } catch {}
+}
+
+function toggleThemes() {
+  const open = $('themePop').hidden;
+  $('themePop').hidden = !open;
+  $('themeButton').setAttribute('aria-expanded', String(open));
+}
+
+function closeThemes() {
+  $('themePop').hidden = true;
+  $('themeButton').setAttribute('aria-expanded', 'false');
+}
+
+function flipCard() {
+  reversed = !reversed;
+  $('flipper').classList.toggle('flipped', reversed);
+  $('front').inert = reversed;
+  $('back').inert = !reversed;
+  $('flipLabel').textContent = reversed ? 'Front' : 'Reverse';
+  closeThemes();
+}
+
+function openEditor() { closeThemes(); editor.showModal(); }
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.theme-pop') && !e.target.closest('#themeButton')) closeThemes();
+});
+
+function render() {
+  Object.keys(data).forEach(key => {
+    if (key !== 'Name' && $('display' + key)) $('display' + key).textContent = data[key];
+  });
+  
+  const words = data.Name.trim().split(/\s+/);
+  const surname = words.length > 1 ? words.pop() : '';
+  $('displayName').textContent = words.join(' ') || 'Your Name';
+  if (surname) {
+    const span = document.createElement('span');
+    span.textContent = surname;
+    $('displayName').append(span);
+  }
+  
+  $('phoneLink').href = 'tel:' + data.Phone.replace(/[^\d+]/g, '');
+  $('emailLink').href = 'mailto:' + encodeURIComponent(data.Email);
+  try {
+    const url = new URL(data.Website);
+    if (['https:', 'http:'].includes(url.protocol)) $('websiteLink').href = url.href;
+  } catch {
+    $('websiteLink').removeAttribute('href');
+  }
+}
+
+const esc = val => val.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
+
+function vcard() {
+  return [
+    'BEGIN:VCARD',
+    'VERSION:3.0',
+    'FN:' + esc(data.Name),
+    'N:' + esc(data.Name) + ';;;;',
+    'ORG:National Protective Service',
+    'TITLE:' + esc(data.Title),
+    'TEL;TYPE=WORK:' + esc(data.Phone),
+    'EMAIL:' + esc(data.Email),
+    'URL:' + esc(data.Website),
+    'ADR;TYPE=WORK:;;' + esc(data.Address) + ';;;;',
+    'END:VCARD'
+  ].join('\r\n');
+}
+
+function generateQR() {
+  const node = $('qrcode');
+  node.replaceChildren();
+  try {
+    if (!window.QRCode) throw Error();
+    new QRCode(node, {
+      text: vcard(),
+      width: 200,
+      height: 200,
+      colorDark: "#101411",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch {
+    node.textContent = 'QR Code generation unavailable.';
+  }
+}
+
+function downloadVCard() {
+  const blob = new Blob([vcard()], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = (data.Name.replace(/[^\p{L}\p{N}_-]+/gu, '_') || 'Contact') + '.vcf';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  notify('Contact vCard File Downloaded');
+}
+
+function notify(msg) {
+  $('notice').textContent = msg;
+  clearTimeout(noticeTimer);
+  noticeTimer = setTimeout(() => $('notice').textContent = '', 3000);
+}
+
+function choosePhoto() { $('file').click(); }
+
+$('file').addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) {
+    notify('Please upload an image file under 10 MB.');
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  $('photo').src = url;
+  notify('Portrait updated successfully');
+});
+
+try { setTheme(localStorage.getItem('nps-card-theme') || 'onyx'); } catch { setTheme('onyx'); }
+render();
+window.addEventListener('load', generateQR);
+</script>
+</body>
+</html>
