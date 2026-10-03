@@ -89,34 +89,46 @@ svg {
   flex-shrink: 0;
 }
 
-/* Structural Layout */
+/* Structural Layout Fix for Safari */
 .viewport {
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 2000px;
-  padding: 20px;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+  padding: 20px 20px 90px 20px;
+}
+
+.flipper-wrapper {
+  width: 100%;
+  max-width: 1050px;
+  position: relative;
+  min-height: 580px;
 }
 
 .flipper {
   width: 100%;
-  max-width: 1050px;
-  display: grid;
+  height: 100%;
+  position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .flipper.flipped {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 .face {
-  grid-area: 1/1;
+  position: absolute;
+  inset: 0;
+  width: 100%;
   min-height: 580px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden !important;
+  -webkit-backface-visibility: hidden !important;
   background: radial-gradient(circle at 85% 20%, var(--accent-glow), transparent 45%), var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: 20px;
@@ -124,10 +136,12 @@ svg {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: relative;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
   overflow: hidden;
   transition: background 0.5s, border-color 0.5s, color 0.5s;
+  /* Fix Safari text bleeding */
+  transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
 }
 
 .face::before {
@@ -139,8 +153,13 @@ svg {
   pointer-events: none;
 }
 
+.front {
+  z-index: 2;
+}
+
 .back {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 /* Header Branding */
@@ -159,7 +178,6 @@ svg {
   align-items: center;
 }
 
-/* Adjusted Logo Style for npslog.png */
 .logo-container {
   width: 58px;
   height: 58px;
@@ -298,6 +316,7 @@ h1 span {
   display: flex;
   gap: 12px;
   margin-top: 32px;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -418,6 +437,8 @@ h1 span {
   font-size: 10px;
   letter-spacing: 0.08em;
   z-index: 2;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .footer div {
@@ -432,13 +453,13 @@ h1 span {
   grid-template-columns: 1fr 260px;
   align-items: center;
   gap: 40px;
-  padding: 20px 0;
+  padding: 30px 0;
   z-index: 2;
 }
 
 .back h2 {
   font-family: var(--font-heading);
-  font-size: clamp(28px, 3.5vw, 42px);
+  font-size: clamp(24px, 3.5vw, 42px);
   line-height: 1.15;
   margin: 14px 0;
 }
@@ -446,7 +467,7 @@ h1 span {
 .back p {
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.8;
+  line-height: 1.7;
   max-width: 440px;
 }
 
@@ -468,6 +489,8 @@ h1 span {
 
 .qr-block {
   text-align: center;
+  justify-self: center;
+  width: 100%;
 }
 
 .qr-paper {
@@ -476,18 +499,20 @@ h1 span {
   border-radius: 12px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
   display: inline-block;
+  max-width: 100%;
 }
 
 #qrcode {
   width: 200px;
   height: 200px;
+  max-width: 100%;
   display: grid;
   place-items: center;
 }
 
 #qrcode img, #qrcode canvas {
   max-width: 100%;
-  height: auto;
+  height: auto !important;
 }
 
 /* Fixed Bottom Control Bar */
@@ -506,24 +531,28 @@ h1 span {
   border-radius: 14px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   backdrop-filter: blur(12px);
+  max-width: 92vw;
+  overflow-x: auto;
 }
 
 .toolbar button {
   border: 0;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
+  white-space: nowrap;
 }
 
 .toolbar .divider {
   height: 20px;
   width: 1px;
   background: var(--line);
-  margin: 0 4px;
+  margin: 0 2px;
+  flex-shrink: 0;
 }
 
 .theme-pop {
@@ -613,18 +642,96 @@ input:focus { outline: 1px solid var(--accent); }
 
 @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-/* Responsive adjustments */
+/* Responsive Adjustments for Mobile */
 @media (max-width: 850px) {
-  .hero { grid-template-columns: 1fr; gap: 30px; }
-  .portrait-wrap { justify-self: start; max-width: 100%; }
-  .portrait { height: 260px; }
-  .back-content { grid-template-columns: 1fr; }
-  .qr-block { justify-self: start; }
-  .face { padding: 30px 24px; }
+  .flipper-wrapper, .face { 
+    min-height: auto;
+  }
+  .face { 
+    position: relative;
+    padding: 28px 22px; 
+  }
+  .back {
+    position: absolute;
+  }
+  .hero { 
+    grid-template-columns: 1fr; 
+    gap: 30px; 
+  }
+  .portrait-wrap { 
+    justify-self: start; 
+    max-width: 100%; 
+  }
+  .portrait { 
+    height: 260px; 
+  }
+  .back-content { 
+    grid-template-columns: 1fr; 
+    gap: 28px;
+    padding: 16px 0;
+    text-align: center;
+  }
+  .back .overline {
+    justify-content: center;
+  }
+  .back .overline::before {
+    display: none;
+  }
+  .back p { 
+    margin: 0 auto; 
+  }
+  .tags { 
+    justify-content: center; 
+    margin: 16px 0 22px;
+  }
+  .qr-block { 
+    justify-self: center; 
+  }
+  .footer {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
 }
+
+@media (max-width: 480px) {
+  .viewport {
+    padding: 12px 12px 85px 12px;
+  }
+  .face {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+  .face::before {
+    inset: 8px;
+    border-radius: 10px;
+  }
+  .brand-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .edition {
+    align-self: flex-start;
+  }
+  #qrcode {
+    width: 160px;
+    height: 160px;
+  }
+  .qr-paper {
+    padding: 12px;
+  }
+  .back h2 {
+    font-size: 22px;
+  }
+  .btn {
+    width: 100%;
+  }
+}
+
 @media print {
   .toolbar, dialog, .notice, .hero-actions, .photo-hint { display: none !important; }
-  .viewport { perspective: none; }
+  .viewport { perspective: none; padding: 0; }
   .flipper { transform: none !important; }
   .face { border: 1px solid #ccc; background: #fff !important; color: #000 !important; }
 }
@@ -646,98 +753,100 @@ input:focus { outline: 1px solid var(--accent); }
 </svg>
 
 <main class="viewport">
-  <div class="flipper" id="flipper">
-    
-    <!-- Front Face -->
-    <section class="face front" id="front" aria-label="Front of business card">
-      <header class="brand-row">
-        <div class="brand">
-          <div class="logo-container">
-            <img class="brand-logo-img" id="photo1" alt="National Protective Service Logo" src="npslog.png">
+  <div class="flipper-wrapper">
+    <div class="flipper" id="flipper">
+      
+      <!-- Front Face -->
+      <section class="face front" id="front" aria-label="Front of business card">
+        <header class="brand-row">
+          <div class="brand">
+            <div class="logo-container">
+              <img class="brand-logo-img" id="photo1" alt="National Protective Service Logo" src="npslog.png">
+            </div>
+            <div>
+              <div class="brand-title">National<br>Protective Service</div>
+              <div class="eyebrow">Integrity · Vigilance · Protection</div>
+            </div>
           </div>
-          <div>
+          <div class="edition">Executive Collection / 01</div>
+        </header>
+
+        <div class="hero">
+          <div class="intro">
+            <div class="overline">Executive Protection & Security</div>
+            <h1 id="displayName">Imran <span>Shaik</span></h1>
+            <div class="role" id="displayTitle">Manager · Security Operations</div>
+            
+            <div class="contacts">
+              <a class="contact" id="phoneLink"><svg><use href="#phone"/></svg><span id="displayPhone"></span></a>
+              <a class="contact" id="emailLink"><svg><use href="#mail"/></svg><span id="displayEmail"></span></a>
+              <a class="contact" id="websiteLink" target="_blank" rel="noopener noreferrer"><svg><use href="#globe"/></svg><span id="displayWebsite"></span></a>
+            </div>
+
+            <div class="hero-actions">
+              <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Save Contact</button>
+              <button class="btn" onclick="flipCard()">View Reverse<svg><use href="#arrow"/></svg></button>
+            </div>
+          </div>
+
+          <div class="portrait-wrap">
+            <button class="portrait" onclick="choosePhoto()" aria-label="Change profile photo">
+              <img id="photo" alt="Executive portrait" src="image.jpg">
+              <span class="photo-hint">Change Portrait ↗</span>
+            </button>
+            <div class="portrait-label">
+              <b>Executive Profile</b>
+              <span id="displayBadgeId">NPS-8842-EXEC</span>
+            </div>
+          </div>
+        </div>
+
+        <footer class="footer">
+          <div><svg><use href="#globe"/></svg><span id="displayAddress">Corporate Headquarters · San Jose, CA</span></div>
+          <span>Licensed & Bonded Security Agency</span>
+        </footer>
+      </section>
+
+      <!-- Back Face -->
+      <section class="face back" id="back" aria-label="Back of business card" inert>
+        <header class="brand-row">
+          <div class="brand">
+            <div class="logo-container">
+              <img class="brand-logo-img" alt="National Protective Service Logo" src="npslog.png">
+            </div>
             <div class="brand-title">National<br>Protective Service</div>
-            <div class="eyebrow">Integrity · Vigilance · Protection</div>
+          </div>
+          <div class="edition">Executive Collection / 02</div>
+        </header>
+
+        <div class="back-content">
+          <div>
+            <div class="overline">Instant Connection</div>
+            <h2>Protection begins<br>with a connection.</h2>
+            <p>Scan this QR code with your mobile device camera to save contact credentials directly to your address book.</p>
+            <div class="tags">
+              <span>24/7 Security Patrol</span>
+              <span>Executive Protection</span>
+              <span>Risk Assessment</span>
+            </div>
+            <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Download vCard</button>
+          </div>
+
+          <div class="qr-block">
+            <div class="qr-paper">
+              <div id="qrcode" aria-label="Contact vCard QR code">Generating QR Code...</div>
+            </div>
+            <div class="eyebrow" style="margin-top: 10px; color: var(--accent)">Scan to save details</div>
           </div>
         </div>
-        <div class="edition">Executive Collection / 01</div>
-      </header>
 
-      <div class="hero">
-        <div class="intro">
-          <div class="overline">Executive Protection & Security</div>
-          <h1 id="displayName">Imran <span>Shaik</span></h1>
-          <div class="role" id="displayTitle">Manager · Security Operations</div>
-          
-          <div class="contacts">
-            <a class="contact" id="phoneLink"><svg><use href="#phone"/></svg><span id="displayPhone"></span></a>
-            <a class="contact" id="emailLink"><svg><use href="#mail"/></svg><span id="displayEmail"></span></a>
-            <a class="contact" id="websiteLink" target="_blank" rel="noopener noreferrer"><svg><use href="#globe"/></svg><span id="displayWebsite"></span></a>
-          </div>
+        <footer class="footer">
+          <span>National Protective Service Corporation</span>
+          <span>Your Security. Our Commitment.</span>
+        </footer>
+      </section>
 
-          <div class="hero-actions">
-            <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Save Contact</button>
-            <button class="btn" onclick="flipCard()">View Reverse<svg><use href="#arrow"/></svg></button>
-          </div>
-        </div>
-
-        <div class="portrait-wrap">
-          <button class="portrait" onclick="choosePhoto()" aria-label="Change profile photo">
-            <img id="photo" alt="Executive portrait" src="image.jpg">
-            <span class="photo-hint">Change Portrait ↗</span>
-          </button>
-          <div class="portrait-label">
-            <b>Executive Profile</b>
-            <span id="displayBadgeId">NPS-8842-EXEC</span>
-          </div>
-        </div>
-      </div>
-
-      <footer class="footer">
-        <div><svg><use href="#globe"/></svg><span id="displayAddress">Corporate Headquarters · San Jose, CA</span></div>
-        <span>Licensed & Bonded Security Agency</span>
-      </footer>
-    </section>
-
-    <!-- Back Face -->
-    <section class="face back" id="back" aria-label="Back of business card" inert>
-      <header class="brand-row">
-        <div class="brand">
-          <div class="logo-container">
-            <img class="brand-logo-img" alt="National Protective Service Logo" src="npslog.png">
-          </div>
-          <div class="brand-title">National<br>Protective Service</div>
-        </div>
-        <div class="edition">Executive Collection / 02</div>
-      </header>
-
-      <div class="back-content">
-        <div>
-          <div class="overline">Instant Connection</div>
-          <h2>Protection begins<br>with a connection.</h2>
-          <p>Scan this QR code with your mobile device camera to save contact credentials directly to your address book.</p>
-          <div class="tags">
-            <span>24/7 Security Patrol</span>
-            <span>Executive Protection</span>
-            <span>Risk Assessment</span>
-          </div>
-          <button class="btn primary" onclick="downloadVCard()"><svg><use href="#download"/></svg>Download vCard</button>
-        </div>
-
-        <div class="qr-block">
-          <div class="qr-paper">
-            <div id="qrcode" aria-label="Contact vCard QR code">Generating QR Code...</div>
-          </div>
-          <div class="eyebrow" style="margin-top: 10px; color: var(--accent)">Scan to save details</div>
-        </div>
-      </div>
-
-      <footer class="footer">
-        <span>National Protective Service Corporation</span>
-        <span>Your Security. Our Commitment.</span>
-      </footer>
-    </section>
-
+    </div>
   </div>
 </main>
 
@@ -785,7 +894,7 @@ const data = {
   Email: 'hamid@nationalprotectiveservice.com',
   Website: 'https://nationalprotectiveservice.com',
   BadgeId: 'NPS-8842-EXEC',
-  Address: 'Corporate Headquarters · San Jose, CA'
+  Address: 'Corporate Headquarters · San Francisco, CA'
 };
     
 const themes = {
@@ -796,7 +905,7 @@ const themes = {
   plum: ['Velvet Plum', '#de9bc0']
 };
 
-let reversed = false, qrTimer, noticeTimer, photoURL;
+let reversed = false, qrTimer, noticeTimer;
 const editor = $('editor');
 
 // Build Form Inputs
@@ -861,6 +970,21 @@ function flipCard() {
   $('front').inert = reversed;
   $('back').inert = !reversed;
   $('flipLabel').textContent = reversed ? 'Front' : 'Reverse';
+  
+  // Explicit display toggle after transition to completely prevent WebKit text bleeding
+  setTimeout(() => {
+    if (reversed) {
+      $('front').style.visibility = 'hidden';
+      $('back').style.visibility = 'visible';
+    } else {
+      $('front').style.visibility = 'visible';
+      $('back').style.visibility = 'hidden';
+    }
+  }, 400);
+
+  if (!reversed) $('front').style.visibility = 'visible';
+  if (reversed) $('back').style.visibility = 'visible';
+
   closeThemes();
 }
 
